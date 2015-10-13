@@ -1,0 +1,183 @@
+package searchengine.dictionary;
+ 
+
+//import java.lang.reflect.Array;
+
+class BSTNode <K extends Comparable<K>, V>
+{  
+    public BSTNode<K,V> left;
+    public BSTNode<K,V> right;
+	V value;
+	K key;
+ 
+    public BSTNode(K key,Object value) //node constructor
+	{
+    	this.key=key;
+    	this.value=(V)value;
+    	this.left=null;
+    	this.right=null;
+	}
+
+	public BSTNode(K key,Object value,BSTNode left, BSTNode right) //node constructor
+	{
+		this.key=key;
+		this.value = (V) value;
+		this.left = left;
+		this.right = right;
+	}	
+}
+ 
+public class BSTDictionary <K extends Comparable<K>, V> implements DictionaryInterface <K,V>{
+
+	BSTNode root;
+    //int choice, left, right, elem;
+    //int parent;
+    int size=0;
+    int i=0;
+    public K[] keys;
+	K keys1;
+    
+    
+	@Override
+	public K[] getKeys() 
+	{
+		i=0;
+		K[] s = (K[]) new String[size];
+		return preOrder(s,root);
+	}
+	
+
+	public K[] preOrder(K[] s, BSTNode root)
+	{
+		
+	 if(root != null)
+	 {
+	    /*calling the preorder function recursively*/
+		s[i]=(K)root.key;
+		i++;
+		preOrder(s,root.left);
+		//s[i] = (K) root.key;
+	    
+	    preOrder(s,root.right); 
+	 }
+	  return (K[]) s;
+	}
+	@Override
+	public V getValue(K str) 
+	{
+		BSTNode current = root;
+		if(current.key.equals(str))
+		{
+			return (V)current.value;
+		}
+		else
+		{
+			while(current != null)
+			{
+				int comp = ((Comparable<K>) str).compareTo((K) current.key);
+			
+			//checking whether it is present left or right side of the root node 
+			
+				if(comp<0)   //left child
+				{
+				
+				current = current.left;
+				if(current.key.equals(str))
+				{
+					return (V) current.value;
+				}
+			}
+			else
+			{
+				current = current.right;
+				if(current.key.equals(str))
+				{
+					return (V) current.value;
+				}
+			}
+		}
+	}
+	return null;
+	}
+	
+	@Override
+	public void insert(K key,V value) 
+	{
+		root = insert1(key,value, root);	
+	}
+	
+	private BSTNode insert1(K key,Object value,BSTNode current) 
+	{
+		if( current == null )
+		{
+			size++;
+			current = new BSTNode(key,value, null, null); 
+		}
+		else if(((Comparable<K>) key).compareTo((K) current.key)<0) 
+		{
+			current.left = insert1(key,value,current.left);
+		}
+		else if(((Comparable<K>) key).compareTo((K) current.key)>0) 
+		{
+			current.right = insert1(key,value, current.right);
+		}
+		return current;
+	}  
+	
+	@Override
+	public void remove(K key) 
+	{
+		this.removenode(root,key);
+		size--;
+	}
+	
+	private BSTNode removenode(BSTNode sub, Comparable key)
+	{
+		int flag=0;
+		if(sub!=null)
+		{
+			if((sub.key).compareTo(key)<0)
+			{
+				sub.right=removenode(sub.right,key);
+			}
+			else if((sub.key).compareTo(key)>0)
+			{
+				sub.left=removenode(sub.left,key);
+			}
+			else
+			{
+				if((sub.left!=null) && (sub.right!=null))
+				{
+					BSTNode node=findLeftmostChild(sub.right);
+					sub.key=node.key;
+					sub.value=node.value;
+					sub.right=removenode(sub.right,node.key);
+				}
+				else if(sub.left!=null)
+				{
+					sub=sub.left;
+				}
+				else
+				{
+					sub=sub.right;
+				}
+					
+			}
+		}
+		else
+		{
+			System.out.println("No such element");
+			flag=1;
+		}
+		return sub;
+	}
+				
+	private BSTNode findLeftmostChild(BSTNode sub){
+    assert (sub != null);
+    while (sub.left!= null) {
+    	sub=sub.left;
+    }
+     return sub;
+}
+}
+
